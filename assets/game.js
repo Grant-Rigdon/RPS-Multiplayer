@@ -15,7 +15,12 @@ var database = firebase.database();
 var playerOne = null;
 var playerTwo = null;
 var p1choice = "";
-var p2choice = ""
+var p2choice = "";
+var p1wins = 0;
+var p2wins = 0;
+var p1losses = 0;
+var p2losses = 0;
+var ties = 0;
 
 
 $(document).ready(function () {
@@ -46,7 +51,7 @@ $(document).ready(function () {
       $("#line2").html("Waiting for <button id= 'buttonTwo' type='button' class='btn btn-outline-danger'>Player 2</button>")
     };
     if (playerOne && playerTwo) {
-      $("#line1").text("Waiting on player 1 to choose...");
+      $("#line1").text("Choose Rock, Paper, or Scissors");
     }
     $("#buttonOne").on("click", function (event) {
       event.preventDefault();
@@ -62,7 +67,8 @@ $(document).ready(function () {
       $(".choice").on("click", function () {
         console.log(this.id);
         database.ref("/players/playerOne/choice").set(this.id);
-        p1choice = database.ref("playerOne/choice");
+        p1choice = this.id;
+        console.log(p1choice)
       });
     });
     $("#buttonTwo").on("click", function (event) {
@@ -80,30 +86,33 @@ $(document).ready(function () {
       $(".choice").on("click", function () {
         console.log(this.id);
         database.ref("/players/playerTwo/choice").set(this.id);
-        p2choice = database.ref("playerTwo/choice");
+        p2choice = this.id;
       });
 
-    if (snapshot.child("playerOne/choice").exists() && snapshot.child("playerTwo/choice").exists()) {
-      if (p1choice == p2choice) {
-        $("#line1").text("It's a tie!");
-        ties++;
-        database.ref("/players/" + p1Id + "/tie").set(ties);
-        database.ref("/players/" + p2Id + "/tie").set(ties);
-      } else if (p1choice == 'rock' && p2choice == 'scissors' || p1choice == 'papaer' && p2choice == 'rock' || p1choice == 'scissors' && p2choice == 'paper') {
-        $("#line1").text("Player 1 Wins!");
-        p1wins++;
-        p2losses++;
-        database.ref("/players/" + p1Id + "/win").set(p1wins);
-        database.ref("/players/" + p2Id + "/loss").set(p2losses);
-      } else {
-        $("#line1").text("Player 1 Wins!");
-        p1losses++;
-        p2wins++;
-        database.ref("/players/" + p2Id + "/win").set(p2wins);
-        database.ref("/players/" + p1Id + "/loss").set(p1losses);
-      }
-    }
     });
+    database.ref("/players/").on("value", function (snapshot) {
+      if (snapshot.child("playerOne/choice").exists() && snapshot.child("playerTwo/choice").exists()) {
+        if (p1choice == p2choice) {
+          $("#line1").text("It's a tie!");
+          ties++;
+          database.ref("/players/playerOne/tie").set(ties);
+          database.ref("/players/playerTwo/tie").set(ties);
+        } else if (p1choice == 'rock' && p2choice == 'scissors' || p1choice == 'paper' && p2choice == 'rock' || p1choice == 'scissors' && p2choice == 'paper') {
+          $("#line1").text("Player 1 Wins!");
+          p1wins++;
+          p2losses++;
+          database.ref("/players/playerOne/win").set(p1wins);
+          database.ref("/players/playerTwo/loss").set(p2losses);
+        } else {
+          $("#line1").text("Player 1 Wins!");
+          p1losses++;
+          p2wins++;
+          database.ref("/players/playerTwo/win").set(p2wins);
+          database.ref("/players/playerOne/loss").set(p1losses);
+        }
+      }
+    });  
+    
 
 
   });
