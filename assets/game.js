@@ -62,7 +62,7 @@ $(document).ready(function () {
       $(".choice").on("click", function () {
         console.log(this.id);
         database.ref("/players/playerOne/choice").set(this.id);
-        p1choice = snapshot.child("playerOne/choice");
+        p1choice = database.ref("playerOne/choice");
       });
     });
     $("#buttonTwo").on("click", function (event) {
@@ -80,7 +80,7 @@ $(document).ready(function () {
       $(".choice").on("click", function () {
         console.log(this.id);
         database.ref("/players/playerTwo/choice").set(this.id);
-        p2choice = snapshot.child("playerTwo/choice");
+        p2choice = database.ref("playerTwo/choice");
       });
 
     if (snapshot.child("playerOne/choice").exists() && snapshot.child("playerTwo/choice").exists()) {
