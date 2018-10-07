@@ -29,7 +29,7 @@ $(document).ready(function () {
       console.log("Player 1 exists");
       $("#line1").text("");
       playerOne = snapshot.val().playerOne;
-      $("#p1-wins").text(playerOne.win);
+      $("#p1-wins").text(playerOne.wins);
       $("#p1-losses").text(playerOne.losses);
       $("#p1-ties").text(playerOne.ties);
     } else {
@@ -42,7 +42,7 @@ $(document).ready(function () {
       console.log("Player 2 exists");
       $("#line2").text("");
       playerTwo = snapshot.val().playerTwo;
-      $("#p2-wins").text(playerTwo.win);
+      $("#p2-wins").text(playerTwo.wins);
       $("#p2-losses").text(playerTwo.losses);
       $("#p2-ties").text(playerTwo.ties);
     } else {
@@ -57,9 +57,9 @@ $(document).ready(function () {
       event.preventDefault();
       console.log("Adding Player 1");
       playerOne = {
-        win: 0,
-        loss: 0,
-        tie: 0,
+        wins: 0,
+        losses: 0,
+        ties: 0,
         choice: ""
       };
       database.ref().child("/players/playerOne").set(playerOne);
@@ -75,9 +75,9 @@ $(document).ready(function () {
       event.preventDefault();
       console.log("Adding Player 2");
       playerTwo = {
-        win: 0,
-        loss: 0,
-        tie: 0,
+        wins: 0,
+        losses: 0,
+        ties: 0,
         choice: ""
       };
       database.ref().child("/players/playerTwo").set(playerTwo);
@@ -92,23 +92,31 @@ $(document).ready(function () {
     });
     database.ref("/players/").on("value", function (snapshot) {
       if (snapshot.child("playerOne/choice").exists() && snapshot.child("playerTwo/choice").exists()) {
-        if (p1choice == p2choice) {
+        if (p1choice == "" || p2choice == ""){
+          
+        } else if(p1choice == p2choice) {
+          p1choice = "";
+          p2choice = "";
           $("#line1").text("It's a tie!");
           ties++;
-          database.ref("/players/playerOne/tie").set(ties);
-          database.ref("/players/playerTwo/tie").set(ties);
+          database.ref("/players/playerOne/ties").set(ties);
+          database.ref("/players/playerTwo/ties").set(ties);
         } else if (p1choice == 'rock' && p2choice == 'scissors' || p1choice == 'paper' && p2choice == 'rock' || p1choice == 'scissors' && p2choice == 'paper') {
+          p1choice = "";
+          p2choice = "";
           $("#line1").text("Player 1 Wins!");
           p1wins++;
           p2losses++;
-          database.ref("/players/playerOne/win").set(p1wins);
-          database.ref("/players/playerTwo/loss").set(p2losses);
+          database.ref("/players/playerOne/wins").set(p1wins);
+          database.ref("/players/playerTwo/losses").set(p2losses);
         } else {
+          p1choice = "";
+          p2choice = "";
           $("#line1").text("Player 1 Wins!");
           p1losses++;
           p2wins++;
-          database.ref("/players/playerTwo/win").set(p2wins);
-          database.ref("/players/playerOne/loss").set(p1losses);
+          database.ref("/players/playerTwo/wins").set(p2wins);
+          database.ref("/players/playerOne/losses").set(p1losses);
         }
       }
     });  
