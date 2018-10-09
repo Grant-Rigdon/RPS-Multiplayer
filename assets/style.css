@@ -22,3 +22,7 @@ img {
     width : auto;
     cursor: pointer;
 }
+
+img:active{
+    border: 5px,solid,#d9534f;
+}

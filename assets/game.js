@@ -47,9 +47,52 @@ $(document).ready(function () {
       player2 = null;
       $("#line2").html("Waiting for <button id= 'buttonTwo' type='button' class='btn btn-outline-danger'>Player 2</button>")
     };
+    
     if (playerOne && playerTwo) {
       $("#line1").text("Choose Rock, Paper, or Scissors");
-    }
+      $("#line2").html("Then <button id= 'submit' type='button' class='btn btn-outline-danger'>Submit</button>");
+      $("#submit").on("click",function() {
+        $("#line2").html("");
+        database.ref("/players/").once('value').then(function(snapshot) {
+          playerOne.choice = snapshot.val().playerOne.choice;
+          playerTwo.choice = snapshot.val().playerTwo.choice;
+        });
+        console.log(playerOne.choice)
+        if (playerOne.choice && playerTwo.choice) {
+          // p1choice = snapshot.val().playerOne.choice;
+          // p2choice = snapshot.val().playerTwo.choice;
+          if (playerOne.choice === "" || playerTwo.choice === "") {
+            stop();
+          } else if (playerOne.choice === playerTwo.choice) {
+            // snapshot.val().playerOne.choice = "";
+            // snapshot.val().playerTwo.choice = "";
+            $("#line2").text("It's a tie!");
+            database.ref("/players/playerOne/ties").set(playerOne.ties + 1);
+            database.ref("/players/playerTwo/ties").set(playerTwo.ties + 1);
+            
+          } else if (playerOne.choice === 'rock' && playerTwo.choice === 'scissors' || playerOne.choice === 'paper' && playerTwo.choice === 'rock' ||playerOne.choice === 'scissors' && playerTwo.choice === 'paper') {
+            // snapshot.val().playerOne.choice = "";
+            // snapshot.val().playerTwo.choice = "";
+            $("#line2").text("Player 1 Wins!");
+            database.ref("/players/playerOne/wins").set(playerOne.wins + 1);
+            database.ref("/players/playerTwo/losses").set(playerTwo.losses + 1);
+            
+          } else {
+            // snapshot.val().playerOne.choice = "";
+            // snapshot.val().playerTwo.choice = "";
+            $("#line2").text("Player 2 Wins!");
+            database.ref("/players/playerTwo/wins").set(playerTwo.wins + 1);
+            database.ref("/players/playerOne/losses").set(playerOne.losses + 1);
+            
+          }
+        };
+
+
+
+      });
+
+    };
+    
     $("#buttonOne").on("click", function (event) {
       event.preventDefault();
       console.log("Adding Player 1");
@@ -65,9 +108,11 @@ $(document).ready(function () {
         console.log(this.id);
         database.ref("/players/playerOne/choice").set(this.id);
         
-        console.log(p1choice)
-      });
+      });  
+    
+      
     });
+    
     $("#buttonTwo").on("click", function (event) {
       event.preventDefault();
       console.log("Adding Player 2");
@@ -83,56 +128,9 @@ $(document).ready(function () {
       $(".choice").on("click", function () {
         console.log(this.id);
         database.ref("/players/playerTwo/choice").set(this.id);
-        
+
       });
-
-    });
-    database.ref("/players/").on("value", function (snapshot) {
-      p1choice = snapshot.val().playerOne.choice;
-      p2choice = snapshot.val().playerTwo.choice;
-      if (snapshot.child("playerOne/choice").exists() && snapshot.child("playerTwo/choice").exists()) {
-        
-        if (p1choice === "" || p2choice === ""){
-          
-        } else if(p1choice === p2choice) {
-          
-          $("#line2").text("It's a tie!");
-          p1choice = "";
-          p2choice = "";
-          database.ref("/players/playerOne/ties").set(playerOne.ties+1);
-          database.ref("/players/playerTwo/ties").set(playerTwo.ties+1);
-          
-        } else if (p1choice === 'rock' && p2choice === 'scissors' || p1choice === 'paper' && p2choice === 'rock' || p1choice === 'scissors' && p2choice === 'paper') {
-          
-          $("#line2").text("Player 1 Wins!");
-          p1choice = "";
-          p2choice = "";          
-          database.ref("/players/playerOne/wins").set(playerOne.wins+1);
-          database.ref("/players/playerTwo/losses").set(playerTwo.losses+1);
-          
-        } else {
-          
-          $("#line2").text("Player 2 Wins!");
-          p1choice = "";
-          p2choice = "";        
-          database.ref("/players/playerTwo/wins").set(playerTwo.wins+1);
-          database.ref("/players/playerOne/losses").set(playerOne.losses+1);
-          
-        }
-      }
-    });  
-    
-
+    }); 
 
   });
-
-
-
-
-
-
-
-
-
-
 });
